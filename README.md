@@ -76,20 +76,7 @@ This app is a DeFi DApp based on Smart Contract ERC20 Token standards and Ethere
             return convertedValue;
         }
 
-* Screenshots Of The App
-    * ![](/project_images/app_image1.jpg)
-    * ![](/project_images/app_image2.jpg)
 
-* Screenshots Testing The App
-    * ![](/project_images/app_test1.jpg)
-    * ![](/project_images/app_test2.jpg)
-
-* Logo
-    * ![](/src/components/logo.png)
-
-* Developer Team
-    * Jose Tollinchi
-    * https://github.com/AnaIitico
 
 * Resources
     * https://etherscan.io/apis
