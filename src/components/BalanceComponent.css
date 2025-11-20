@@ -1,0 +1,49 @@
+div{
+    text-align: center;
+    background-color: #ffffff;
+    border-color: white;
+
+}
+
+.graph{
+    text-align: left;
+    text-color:rgb(16, 16, 16);
+    background-color: antiquewhite;
+}
+
+.background{
+    background-color: aliceblue;
+}
+/* Add this to your existing BalanceComponent.css */
+.glowing-cursor {
+  caret-color: #00ff00;
+  position: relative;
+}
+
+.glowing-cursor:focus {
+  outline: none;
+  border-color: #00ff00;
+  box-shadow: 0 0 10px #00ff00;
+}
+
+.glowing-cursor::after {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 20px;
+  background-color: #00ff00;
+  animation: blink 1s infinite;
+  margin-left: 2px;
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 5px #00ff00,
+                0 0 10px #00ff00,
+                0 0 20px #00ff00;
+  }
+  50% {
+    opacity: 0;
+  }
+}

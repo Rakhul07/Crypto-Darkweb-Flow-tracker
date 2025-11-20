@@ -1,0 +1,100 @@
+/* Restrict styles to navbar only */
+.navbar-container {
+  
+  padding: 10px 0;
+  width: 100%;
+  /* position: relative; */
+  z-index: 1000; /* Ensure it's above other elements */
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0 20px;
+}
+
+/* Logo */
+.navbar-container .logo-img {
+  width: 60px;
+  height: 40px;
+  border-radius: 7px;
+}
+
+/* Hamburger Menu Button */
+.navbar-container .navbar-toggler {
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: white;
+  display: block;
+
+}
+
+/* Navbar Menu - Hidden by default */
+.navbar-container .navbar-menu {
+  /* display: none;
+  position: absolute;
+  top: 60px;
+  right: 20px; */
+  background-color: #444;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Show menu when active */
+.navbar-container .navbar-menu.active {
+  /* display: block; */
+}
+
+/* Navigation List */
+.navbar-container .navbar-nav {
+  list-style: none;
+  padding: 0;
+  
+  display: flex;
+  flex-direction: row;
+  margin: 0;
+}
+
+/* Navigation Items */
+.navbar-container .nav-item {
+  padding: 10px;
+}
+
+/* Navigation Links */
+.navbar-container .nav-link {
+  text-decoration: none;
+  color: rgb(0, 0, 0);
+  font-size: 18px;
+  font-weight: bold;
+  display: block;
+  padding: 8px 12px;
+}
+
+.navbar-container .nav-link:hover {
+  color: #ddd;
+}
+
+/* Responsive: Show menu inline on larger screens */
+@media (min-width: 768px) {
+  .navbar-container .navbar-menu {
+    display: flex !important;
+    position: static;
+    background: none;
+    padding: 0;
+  }
+
+  .navbar-container .navbar-toggler {
+    display: none;
+  }
+
+  .navbar-container .navbar-nav {
+    display: flex;
+    gap: 20px;
+  }
+}
