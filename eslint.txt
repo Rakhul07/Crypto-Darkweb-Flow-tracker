@@ -1,0 +1,12 @@
+﻿
+C:\Users\Nithishwar\Downloads\Crypto-Currency-Darkweb-Flow-Detection-main\Crypto-chain-tracker-main\src\Home.js
+  3:18  warning  'LineChart' is defined but never used  no-unused-vars
+
+C:\Users\Nithishwar\Downloads\Crypto-Currency-Darkweb-Flow-Detection-main\Crypto-chain-tracker-main\src\components\BalanceComponent.js
+  11:24  warning  'setPrivateNotes' is assigned a value but never used  no-unused-vars
+
+C:\Users\Nithishwar\Downloads\Crypto-Currency-Darkweb-Flow-Detection-main\Crypto-chain-tracker-main\src\components\WalletAddressForm.js
+  3:23  warning  'useSelector' is defined but never used  no-unused-vars
+
+Γ£û 3 problems (0 errors, 3 warnings)
+

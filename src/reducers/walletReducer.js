@@ -4,16 +4,14 @@ import {REMOVE} from '../actions/types';
 import {INCREMENT} from '../actions/types';
 import {DECREMENT} from '../actions/types';
 
-const web3 = (state, action) => {
-    
-    if(state == null){
-        state = {
-            counter: 0,
-            address: [],
-            lastAddress: "",
-            walletData: []
-        }
-    }
+const initialState = {
+    counter: 0,
+    address: [],
+    lastAddress: "",
+    walletData: []
+};
+
+const web3 = (state = initialState, action) => {
 
     switch(action.type){
 

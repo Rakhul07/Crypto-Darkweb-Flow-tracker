@@ -14,6 +14,8 @@ import {convertedDate} from './helpers';
 import {convertedValue} from './helpers';
 
 import {welcomeText} from './helpers';
+import { analyzeTransactions, walletRiskSummary } from './walletHeuristics';
+import SuspiciousAlert from './SuspiciousAlert';
 // import {findLogo} from './helpers'
 // import {rpcURL} from '../keys';
 // const Web3 = require('web3');
@@ -28,6 +30,10 @@ const BlockchainTxns = () => {
     const lastAddress = useSelector(state => state.wallet.lastAddress);
     const walletData = useSelector(state => state.wallet.walletData);
     const dispatch = useDispatch();
+
+    // Heuristic analysis — runs whenever walletData changes
+    const flaggedTxs = React.useMemo(() => analyzeTransactions(walletData || []), [walletData]);
+    const riskSummary = React.useMemo(() => walletRiskSummary(flaggedTxs, (walletData || []).length), [flaggedTxs, walletData]);
 
     useEffect(() => {
         //*componentDidUnmount - clean up function
@@ -46,20 +52,20 @@ const BlockchainTxns = () => {
             // 0
             const whaleAddressIndex = classArray[classArray.length - 1];
             const whaleAddress = address[whaleAddressIndex];
-            let url="https://api.etherscan.io/api";
+            let url="https://api.etherscan.io/v2/api";
             switch(input){
                 case "url1000":
-                  url = `https://api.etherscan.io/api?module=account&action=txlist&address=${whaleAddress}&startblock=0&endblock=99999999&page=1&offset=1000&sort=desc&apikey=${process.env.REACT_APP_API_KEY}`;
+                  url = `https://api.etherscan.io/v2/api?chainid=1&module=account&action=txlist&address=${whaleAddress}&startblock=0&endblock=99999999&page=1&offset=1000&sort=desc&apikey=${process.env.REACT_APP_API_KEY}`;
                   setshowERC20(false);
                 break;
                 
                 case "ERC20":
-                  url = `https://api.etherscan.io/api?module=account&action=tokentx&address=${whaleAddress}&startblock=0&endblock=99999999&page=1&offset=1000&sort=desc&apikey=${process.env.REACT_APP_API_KEY}`;
+                  url = `https://api.etherscan.io/v2/api?chainid=1&module=account&action=tokentx&address=${whaleAddress}&startblock=0&endblock=99999999&page=1&offset=1000&sort=desc&apikey=${process.env.REACT_APP_API_KEY}`;
                   if(!showAnalytics) setshowERC20(true);
                 break;
 
                 case "NFTS":
-                  url = `https://api.etherscan.io/api?module=account&action=tokennfttx&address=${whaleAddress}&startblock=0&endblock=999999999&page=1&offset=100&sort=desc&apikey=${process.env.REACT_APP_API_KEY}`;
+                  url = `https://api.etherscan.io/v2/api?chainid=1&module=account&action=tokennfttx&address=${whaleAddress}&startblock=0&endblock=999999999&page=1&offset=100&sort=desc&apikey=${process.env.REACT_APP_API_KEY}`;
                   setshowERC20(false);
                 break;
 
@@ -189,9 +195,20 @@ const BlockchainTxns = () => {
                     </Container>
                     {/* begin mapping walletData Blockchain Txns */}
                     { showAnalytics ? <Analytics /> : null}
-                    <Container className="card-body"> {walletData && walletData.map(walletData => {
+                    <Container className="card-body">
+                      {/* Heuristic suspicious wallet detection panel */}
+                      {!showAnalytics && walletData && walletData.length > 0 && (
+                        <SuspiciousAlert
+                          flagged={flaggedTxs}
+                          total={(walletData || []).length}
+                          riskSummary={riskSummary}
+                        />
+                      )}
+                      {walletData && walletData.map((walletData, txIdx) => {
+                        const isFlagged = flaggedTxs.some(f => f.tx.hash === walletData.hash);
                         return <>
-                            <Row className="blockchain-txns">
+                            <Row className="blockchain-txns" style={isFlagged ? { backgroundColor: 'rgba(239,68,68,0.12)', borderLeft: '3px solid #ef4444' } : {}}>
+                              {isFlagged && <Col xs="auto" style={{ color: '#ef4444', fontWeight: 700, paddingRight: 0 }} title="Flagged by heuristic analysis">⚠️</Col>}
                               <Col className="blockchain-txns-hash">{`${walletData.hash}`}</Col>
                               {/* {showERC20 ? <div className="flex-fill p-2 blockchain-txns-symbol" > {walletData.tokenSymbol && walletData.tokenSymbol} </div> : null} */}
                               {showERC20 && walletData.tokenSymbol ? <Col className=" blockchain-txns-symbol" > <img className="logo" src={findLogo(walletData.tokenSymbol)} alt="" /> {walletData.tokenSymbol && walletData.tokenSymbol} </Col> : null}

@@ -2,3 +2,331 @@
   margin: 0;
   padding: 0;
 }
+
+/* ─── Global link reset: no underlines anywhere ─── */
+a,
+a:hover,
+a:focus,
+a:active,
+a:visited {
+  text-decoration: none !important;
+}
+
+/* ─── Bootstrap dark overrides for BlockchainTxns page ─── */
+.card.bg-dark {
+  background-color: #111 !important;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.card-header {
+  background-color: #181818 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+  color: #f0f0f0 !important;
+  font-weight: 700;
+  font-size: 0.95rem;
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.card-body {
+  background-color: #111 !important;
+  color: #f0f0f0 !important;
+  padding: 18px;
+}
+
+/* ─── Content layout: dark bg ─── */
+.content {
+  background: #0a0a0a;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.vertical-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.vertical {
+  margin-top: 0;
+}
+
+.vertical .card-body {
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.vertical .card-body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* ─── Address list and buttons ─── */
+.address-list {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.address-list h6 {
+  color: #a0a0a0;
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.82rem;
+  word-break: break-all;
+  margin: 0;
+}
+
+.address-buttons,
+button.address-buttons {
+  background: rgba(230, 57, 70, 0.14);
+  color: #ff6b6b;
+  border: 1px solid rgba(230, 57, 70, 0.3);
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.address-buttons:hover {
+  background: rgba(230, 57, 70, 0.28);
+  transform: translateY(-1px);
+}
+
+/* ─── Blockchain Transaction table rows ─── */
+.blockchain-txns-header {
+  display: flex;
+  align-items: center;
+  background: #181818 !important;
+  color: #6b6b6b;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 12px 16px;
+  border-bottom: 2px solid rgba(230, 57, 70, 0.25);
+  gap: 8px;
+  margin: 0;
+  min-width: 980px;
+}
+
+.blockchain-txns-header .col,
+.blockchain-txns-header [class*="col-"] {
+  color: #6b6b6b;
+}
+
+.blockchain-txns {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.84rem;
+  color: #d0d0d0;
+  gap: 8px;
+  transition: background 0.15s ease;
+  min-width: 980px;
+  position: relative;
+}
+
+.blockchain-txns:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.blockchain-txns:nth-child(even) {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.blockchain-txns:nth-child(even):hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.blockchain-txns-hash,
+.blockchain-txns-from,
+.blockchain-txns-to {
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.78rem;
+  color: #a0a0a0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.blockchain-txns .col,
+.blockchain-txns [class*="col-"],
+.blockchain-txns-header .col,
+.blockchain-txns-header [class*="col-"] {
+  min-width: 0;
+  max-width: none;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.blockchain-txns > .col-auto {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  width: 20px;
+  padding: 0;
+  transform: translateY(-50%);
+}
+
+.blockchain-txns > .col-auto + .blockchain-txns-hash {
+  padding-left: 28px;
+}
+
+.blockchain-txns-hash,
+.blockchain-txns-header-hash {
+  flex: 1.9 1 240px;
+}
+
+.blockchain-txns-symbol,
+.blockchain-txns-header-symbol {
+  flex: 0.8 1 120px;
+}
+
+.blockchain-txns-blocknumber,
+.blockchain-txns-header-blocknumber {
+  flex: 0.75 1 120px;
+}
+
+.blockchain-txns-timestamp,
+.blockchain-txns-header-timestamp {
+  flex: 1 1 150px;
+}
+
+.blockchain-txns-from,
+.blockchain-txns-header-from,
+.blockchain-txns-to,
+.blockchain-txns-header-to {
+  flex: 1.35 1 200px;
+}
+
+.blockchain-txns-value,
+.blockchain-txns-header-value {
+  flex: 0.85 1 130px;
+  text-align: right;
+}
+
+.blockchain-txns-blocknumber {
+  color: #d0d0d0;
+  font-weight: 600;
+}
+
+.blockchain-txns-timestamp {
+  color: #6b6b6b;
+  font-size: 0.8rem;
+}
+
+.blockchain-txns-value {
+  color: #e63946;
+  font-weight: 700;
+  text-align: right;
+}
+
+.blockchain-txns-symbol {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #d0d0d0;
+  font-weight: 600;
+}
+
+.blockchain-txns-symbol .logo,
+img.logo {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ─── Header alignment consistent across header types ─── */
+.blockchain-txns-header-hash,
+.blockchain-txns-header-blocknumber,
+.blockchain-txns-header-timestamp,
+.blockchain-txns-header-from,
+.blockchain-txns-header-to,
+.blockchain-txns-header-value,
+.blockchain-txns-header-symbol {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #6b6b6b;
+}
+
+/* ─── Container overrides (Bootstrap) ─── */
+.container,
+.container-fluid {
+  background: transparent !important;
+  color: #f0f0f0 !important;
+}
+
+/* ─── Row overrides for Bootstrap ─── */
+.row {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* ─── Form styling in dark mode ─── */
+.form-group input,
+.form-group .input,
+.fg--search input {
+  background: #141414 !important;
+  color: #f0f0f0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+  padding: 14px 18px;
+  font-size: 0.92rem;
+  outline: none;
+}
+
+.form-group input:focus,
+.fg--search input:focus {
+  border-color: rgba(230, 57, 70, 0.4) !important;
+  box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.1);
+}
+
+.form-group input::placeholder,
+.fg--search input::placeholder {
+  color: #6b6b6b;
+}
+
+.fg--search {
+  background: transparent !important;
+}
+
+.fg--search button {
+  color: #ff6b6b;
+}
+
+/* ─── Select elements ─── */
+select,
+select.form-control {
+  background: #141414 !important;
+  color: #f0f0f0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+}
+
+/* ─── Responsive table columns ─── */
+@media (max-width: 1080px) {
+  .vertical-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .content {
+    padding: 16px;
+  }
+
+  .blockchain-txns-header,
+  .blockchain-txns {
+    font-size: 0.72rem;
+    padding: 10px 12px;
+  }
+}
