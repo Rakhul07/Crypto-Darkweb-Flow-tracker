@@ -1,98 +1,74 @@
-1. This app fetches the transaction information of a crypto wallet from the blockchain and displays it on the screen as useful analytical data.  The user is able to save multiple wallets that he/she is tracking and also able to view multiple assets (currencies) held in the wallet.  Future capability will be for the user to create an account to save the wallets being tracked. User identity is protected since there's no KYC requirement and the user is not connecting or otherwise exposing his/her crypto assets on this site, and all that's required for the site to maintain the saved data is a user profile created with email and password.
+# Crypto Darkweb Flow Tracker
 
-    I used Etherscan API to fetch blockchain data and a price API to fetch the current price at the time of fetch.  I also used a .env file to protect addresses/api-keys/and node endpoints.
+Crypto Darkweb Flow Tracker is a React dashboard for monitoring wallet activity across public blockchain data. It pulls transaction and balance data from Etherscan-compatible endpoints, surfaces wallet analytics, and highlights suspicious transfer patterns in a cleaner investigation-focused UI.
 
-2. M.V.P
-    *Provide the following:
-    - Securely connect to API
-    - Build out all pages with buttons
-    - All buttons working and navigates to designated page
-    - All API calls display the proper object layout
+Live site:
+https://rakhul07.github.io/Crypto-Darkweb-Flow-tracker/
 
-3. Color schemes 
-- I used bootstrap cards
-- The colors used are #007bff, #1d1d1d, and #95999c
+## Features
 
-* Title Crypto Whale Tracker
-        Live hosting on Heroku
-    - https://crypto-whale-tracker.netlify.app/
+- Wallet transaction lookup for tracked addresses
+- Balance and activity views for supported networks
+- ERC-20 transaction inspection
+- Market analytics dashboard
+- Suspicious flow heuristics for high-risk transaction patterns
+- Local wallet tracking with Redux state persistence
 
-* Overview
-This app is a DeFi DApp based on Smart Contract ERC20 Token standards and Ethereum Blockchain. The user can securely connect to the Ehterscan network and fetch data from a wallet he/she wishes to track for analytical purposes and maintain a saved list of wallets they wish to track on a consistent basis.
+## Tech Stack
 
-* Languages:  React, Redux, CSS, JS, HTML
-    * Other: Ethereum, JSON, Postman, Web3, Babelrc, Solidity,
-     
-* Stretch Goals (Future)
-    * Analytics result view for ERC20 API call
+- React
+- Redux
+- React Router
+- Bootstrap and custom CSS
+- Etherscan API
+- CoinGecko market data API
+- Express for local auth/API experiments
 
-* Code Snippets
+## GitHub Pages Notes
 
-    The code below shows how the header is displayed based on the type of api call. If the user selects the ERC20 results then the header and the view are displayed accordingly.  The ERC20 displays the Symbol Name
+GitHub Pages only serves the static frontend. The React app is configured for GitHub Pages routing, and the repository includes a GitHub Actions workflow to deploy the `build` output automatically from `main`.
 
-        <div className="vertical">
-            <div className="card bg-dark text-white">
-                <div className="card-header">Blockchain Transactions for wallet address :<span>{<span> {'\u00A0'} {lastAddress}</span> }</span>
-                  
-                {showERC20 ? <HeaderERC20 /> : <Header />}
-                    
-                  
-                </div>
-                {/* begin mapping walletData Blockchain Txns */}
-                <div className="card-body d-flex flex-column"> {walletData && walletData.map(walletData => {
-                    return <>
-                        <div className="d-flex flex-row blockchain-txns">
-                          <div className="flex-fill p-2 blockchain-txns-hash">{`${walletData.hash}`}</div>
-                          {showERC20 ? <div className="flex-fill p-2 blockchain-txns-symbol">{walletData.tokenSymbol && walletData.tokenSymbol}</div> : null}
-                          <div className="flex-fill p-2 blockchain-txns-blocknumber">{`${walletData.blockNumber}`}</div>
-                          <div className="flex-fill p-2 blockchain-txns-timestamp">{convertedDate(walletData.timeStamp)}</div>
-                          <div className="flex-fill p-2 blockchain-txns-from">{`${walletData.from}`}</div>
-                          <div className="flex-fill p-2 blockchain-txns-to">{`${walletData.to}`}</div>
-                          <div className="flex-fill p-2 blockchain-txns-value">{`${convertedValue(walletData.value)}`}</div>
-                        </div>
-                      </>;
-                    })}
-                    {/* end mapping walletData Blockchain Txns */}
-                </div>
-            </div>
-          </div>
+The local Express server in `server.js` is not hosted by GitHub Pages. If you want signup/login endpoints live, they need a separate backend host.
 
-    The below code shows the conversion for the date and value data received from the blockchain and then returned to the component for rendering.
+To make GitHub Pages builds use your Etherscan key, add this repository secret in GitHub:
 
-        export const convertedDate = (date) => {
-            date = (date * 1000);
-            let convertedDate = new Date (date);
-            return convertedDate.toString();
-        }
+- `REACT_APP_API_KEY`
 
-        export const convertedValue = (value) => {
-            let convertedValue = (value);
-            if(convertedValue === undefined){
-                convertedValue = 0;
-            }
-            else {
-                convertedValue = convertedValue / 1000000000000000000;//this is the Wei value for ethereum
-            }
-            return convertedValue;
-        }
+## Local Development
 
-* Screenshots Of The App
-    * ![](/project_images/app_image1.jpg)
-    * ![](/project_images/app_image2.jpg)
+1. Install dependencies:
 
-* Screenshots Testing The App
-    * ![](/project_images/app_test1.jpg)
-    * ![](/project_images/app_test2.jpg)
+```powershell
+npm.cmd install
+```
 
-* Logo
-    * ![](/src/components/logo.png)
+2. Create a local `.env` from `.env.example` and add your Etherscan API key.
 
-* Resources
-    * https://etherscan.io/apis
-    * https://web3js.readthedocs.io/en/v1.3.4/
-    * https://javascript.info/async
-    * https://reactjs.org/
-    * https://docs.soliditylang.org/en/v0.5.7/
-    * https://eips.ethereum.org/EIPS/eip-20
-    * https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md
-    
+3. Start the React app:
+
+```powershell
+npm.cmd start
+```
+
+4. Optional: run the local Express server separately:
+
+```powershell
+node server.js
+```
+
+## Screenshots
+
+![App overview](./project_images/app_image1.png)
+![Wallet analytics](./project_images/app_image2.png)
+![Testing snapshot 1](./project_images/app_test1.png)
+![Testing snapshot 2](./project_images/app_test2.png)
+
+## Resources
+
+- https://etherscan.io/apis
+- https://web3js.readthedocs.io/en/v1.3.4/
+- https://javascript.info/async
+- https://reactjs.org/
+- https://docs.soliditylang.org/en/v0.5.7/
+- https://eips.ethereum.org/EIPS/eip-20
+- https://github.com/ethereum/EIPs/blob/master/EIPS/eip-20.md

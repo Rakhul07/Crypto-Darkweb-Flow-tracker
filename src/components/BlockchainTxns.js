@@ -79,7 +79,6 @@ const BlockchainTxns = () => {
               const walletData = await response.json();
               if(walletData.message !== 'OK'){
                 alert(`${walletData.message} for address ${whaleAddress}.  Please try again!`);
-                console.log("API Key:", process.env.REACT_APP_API_KEY);
                 console.log("Whale Address:", whaleAddress);
                 console.log("API Request URL:", url);
               }
@@ -99,8 +98,6 @@ const BlockchainTxns = () => {
         }
         catch(err) {
             alert(err);
-            console.log("API Key:", process.env.REACT_APP_API_KEY);
-
         };
     };
     // for testing only - getting the actual date from a timestamp

@@ -1,6 +1,7 @@
 {
-  "name": "crypto-whale-tracker",
+  "name": "crypto-darkweb-flow-tracker",
   "version": "0.1.0",
+  "homepage": "https://rakhul07.github.io/Crypto-Darkweb-Flow-tracker",
   "engines": {
     "node": "14.17.6",
     "npm": "6.14.15"
@@ -66,7 +67,7 @@
   "devDependencies": {
     "raw-loader": "^4.0.2"
   },
-  "description": "1. This app fetches the transaction information of a crypto wallet from the blockchain and displays it on the screen as useful analytical data.  The user is able to save multiple wallets that he/she is tracking and also able to view multiple assets (currencies) held in the wallet.  Future capability will be for the user to create an account to save the wallets being tracked. User identity is protected since there's no KYC requirement and the user is not connecting or otherwise exposing his/her crypto assets on this site, and all that's required for the site to maintain the saved data is a user profile created with email and password.",
+  "description": "React wallet flow tracker for reviewing blockchain transactions, balances, token movement, and suspicious activity signals.",
   "main": "index.js",
   "keywords": [],
   "author": "",
