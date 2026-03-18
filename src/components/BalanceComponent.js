@@ -62,6 +62,40 @@ const formatTimestamp = (timeStamp) => {
   return new Date(numericStamp * 1000).toLocaleString();
 };
 
+const getProxyResult = (response, label, options = {}) => {
+  const { allowNull = false } = options;
+  const data = response?.data;
+
+  if (data?.result === null && allowNull) {
+    return null;
+  }
+
+  if (data?.result && typeof data.result === 'object' && !Array.isArray(data.result)) {
+    return data.result;
+  }
+
+  const rawMessage =
+    typeof data?.result === 'string'
+      ? data.result
+      : typeof data?.message === 'string'
+        ? data.message
+        : `Unexpected response while loading ${label}.`;
+
+  throw new Error(rawMessage);
+};
+
+const getTransactionStatus = (status) => {
+  if (status === '0x1') {
+    return { label: 'Success', tone: 'success' };
+  }
+
+  if (status === '0x0') {
+    return { label: 'Failed', tone: 'danger' };
+  }
+
+  return { label: 'Pending', tone: 'pending' };
+};
+
 const BalanceComponent = () => {
   const [balances, setBalances] = useState({});
   const [transactions, setTransactions] = useState([]);
@@ -187,11 +221,7 @@ const BalanceComponent = () => {
         },
       });
 
-      const txData = txResponse.data.result;
-      if (!txData) {
-        setError('Transaction not found. Verify the hash and selected network.');
-        return;
-      }
+      const txData = getProxyResult(txResponse, 'transaction details');
 
       const receiptResponse = await axios.get('https://api.etherscan.io/v2/api', {
         params: {
@@ -203,25 +233,29 @@ const BalanceComponent = () => {
         },
       });
 
-      const receiptData = receiptResponse.data.result;
+      const receiptData = getProxyResult(receiptResponse, 'transaction receipt', { allowNull: true });
+      const normalizedTx = {
+        ...txData,
+        hash: txData.hash || receiptData?.transactionHash || txHash,
+        from: txData.from || receiptData?.from || 'Unknown',
+        to: txData.to || receiptData?.to || null,
+        blockNumber: txData.blockNumber || receiptData?.blockNumber || null,
+        gasUsed: receiptData?.gasUsed || null,
+        status: receiptData?.status || null,
+      };
+
       const suspiciousReasons = detectSingleSuspicious(
-        {
-          ...txData,
-          status: receiptData ? receiptData.status : null,
-          gasUsed: receiptData ? receiptData.gasUsed : null,
-        },
+        normalizedTx,
         cryptoType
       );
 
       setTxDetails({
-        ...txData,
-        status: receiptData ? receiptData.status : null,
-        gasUsed: receiptData ? receiptData.gasUsed : null,
+        ...normalizedTx,
         suspicious: suspiciousReasons.length > 0,
         suspiciousReasons,
       });
     } catch (err) {
-      setError(`Error: ${err.message}`);
+      setError(`Unable to load transaction details: ${err.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -374,6 +408,7 @@ const BalanceComponent = () => {
     lookupType === 'txhash' && txDetails
       ? txDetails.suspiciousReasons.length
       : suspiciousTxs.length;
+  const txStatus = txDetails ? getTransactionStatus(txDetails.status) : null;
 
   const overviewCards = [
     {
@@ -599,8 +634,8 @@ const BalanceComponent = () => {
                 </div>
                 <div className="detail-row">
                   <span>Status</span>
-                  <strong className={txDetails.status === '0x1' ? 'status-chip success' : 'status-chip danger'}>
-                    {txDetails.status === '0x1' ? 'Success' : 'Failed'}
+                  <strong className={`status-chip ${txStatus.tone}`}>
+                    {txStatus.label}
                   </strong>
                 </div>
                 <div className="detail-row">

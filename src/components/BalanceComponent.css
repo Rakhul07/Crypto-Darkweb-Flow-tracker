@@ -413,6 +413,11 @@
   background: rgba(230, 57, 70, 0.16);
 }
 
+.status-chip.pending {
+  color: #b7791f;
+  background: rgba(245, 158, 11, 0.16);
+}
+
 .reason-list,
 .history-list {
   list-style: none;
