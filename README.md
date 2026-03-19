@@ -30,9 +30,23 @@ GitHub Pages only serves the static frontend. The React app is configured for Gi
 
 The local Express server in `server.js` is not hosted by GitHub Pages. If you want signup/login endpoints live, they need a separate backend host.
 
-To make GitHub Pages builds use your Etherscan key, add this repository secret in GitHub:
+The app now ignores placeholder values such as `your_etherscan_api_key` and falls back to the bundled demo key for Ethereum and Polygon, so a deploy will still load instead of failing with `Invalid API Key (#err2)`.
+
+To override that fallback and use your own explorer key in GitHub Pages builds, add this repository secret in GitHub:
 
 - `REACT_APP_API_KEY`
+
+GitHub path:
+
+1. Open the repository on GitHub.
+2. Go to `Settings` -> `Secrets and variables` -> `Actions`.
+3. Create `REACT_APP_API_KEY` with a real Etherscan V2 API key.
+
+Notes:
+
+- Etherscan V2 uses one key across supported chains in this app.
+- Polygon works with the same Etherscan V2 key.
+- BNB lookups on `api.etherscan.io` require a paid Etherscan API plan, so free GitHub Pages deployments may still show a plan-limit error on BNB while ETH, BTC, and Polygon continue to work.
 
 ## Local Development
 
@@ -42,7 +56,7 @@ To make GitHub Pages builds use your Etherscan key, add this repository secret i
 npm.cmd install
 ```
 
-2. Create a local `.env` from `.env.example` and add your Etherscan API key.
+2. Create a local `.env` from `.env.example` and add your Etherscan API key if you want your own quota. Leaving it blank uses the bundled demo key.
 
 3. Start the React app:
 

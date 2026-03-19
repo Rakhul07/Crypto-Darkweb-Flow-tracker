@@ -16,6 +16,7 @@ import {convertedValue} from './helpers';
 import {welcomeText} from './helpers';
 import { analyzeTransactions, walletRiskSummary } from './walletHeuristics';
 import SuspiciousAlert from './SuspiciousAlert';
+import { buildExplorerUrl, getExplorerArrayResult, getExplorerErrorMessage } from './explorerApi';
 // import {findLogo} from './helpers'
 // import {rpcURL} from '../keys';
 // const Web3 = require('web3');
@@ -52,20 +53,46 @@ const BlockchainTxns = () => {
             // 0
             const whaleAddressIndex = classArray[classArray.length - 1];
             const whaleAddress = address[whaleAddressIndex];
-            let url="https://api.etherscan.io/v2/api";
+            let url = buildExplorerUrl('ETH', {
+              module: 'account',
+              action: 'txlist',
+              address: whaleAddress,
+              startblock: 0,
+              endblock: 99999999,
+              page: 1,
+              offset: 1000,
+              sort: 'desc',
+            });
             switch(input){
                 case "url1000":
-                  url = `https://api.etherscan.io/v2/api?chainid=1&module=account&action=txlist&address=${whaleAddress}&startblock=0&endblock=99999999&page=1&offset=1000&sort=desc&apikey=${process.env.REACT_APP_API_KEY}`;
                   setshowERC20(false);
                 break;
                 
                 case "ERC20":
-                  url = `https://api.etherscan.io/v2/api?chainid=1&module=account&action=tokentx&address=${whaleAddress}&startblock=0&endblock=99999999&page=1&offset=1000&sort=desc&apikey=${process.env.REACT_APP_API_KEY}`;
+                  url = buildExplorerUrl('ETH', {
+                    module: 'account',
+                    action: 'tokentx',
+                    address: whaleAddress,
+                    startblock: 0,
+                    endblock: 99999999,
+                    page: 1,
+                    offset: 1000,
+                    sort: 'desc',
+                  });
                   if(!showAnalytics) setshowERC20(true);
                 break;
 
                 case "NFTS":
-                  url = `https://api.etherscan.io/v2/api?chainid=1&module=account&action=tokennfttx&address=${whaleAddress}&startblock=0&endblock=999999999&page=1&offset=100&sort=desc&apikey=${process.env.REACT_APP_API_KEY}`;
+                  url = buildExplorerUrl('ETH', {
+                    module: 'account',
+                    action: 'tokennfttx',
+                    address: whaleAddress,
+                    startblock: 0,
+                    endblock: 999999999,
+                    page: 1,
+                    offset: 100,
+                    sort: 'desc',
+                  });
                   setshowERC20(false);
                 break;
 
@@ -77,22 +104,23 @@ const BlockchainTxns = () => {
             try{
               const response = await fetch(url); //api call for symbol information
               const walletData = await response.json();
-              if(walletData.message !== 'OK'){
-                alert(`${walletData.message} for address ${whaleAddress}.  Please try again!`);
+              const parsedTransactions = getExplorerArrayResult(walletData, 'ETH', 'wallet transactions');
+              if(parsedTransactions.length === 0){
+                alert(`No transactions were returned for address ${whaleAddress}. Please try another address.`);
                 console.log("Whale Address:", whaleAddress);
                 console.log("API Request URL:", url);
               }
               else {
                 // header(input);
-                console.log(walletData.result);
+                console.log(parsedTransactions);
                 // if(input === "ERC20") console.log(walletData.result);
                 // console.log(walletData.result.hash); //console.log api object
                 // if(input === "ERC20") console.log(`line 78 `, walletData.result[0].tokenSymbol);
                 // if(input === "ERC20") console.log(`line 78 `, walletData.result.hash);
-                dispatch(submit(whaleAddress, walletData));
+                dispatch(submit(whaleAddress, { ...walletData, result: parsedTransactions }));
               };
             }catch(err){
-              alert(`Error with fetching data. Please try again. ${err}`)
+              alert(`Error with fetching data. Please try again. ${getExplorerErrorMessage(err, 'ETH', 'wallet transactions')}`)
             };
             
         }

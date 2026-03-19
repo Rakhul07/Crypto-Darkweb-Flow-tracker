@@ -14,13 +14,15 @@ import {
   Wallet2,
 } from 'lucide-react';
 import './BalanceComponent.css';
-
-const NETWORK_LABELS = {
-  ETH: 'Ethereum',
-  BTC: 'Bitcoin',
-  MATIC: 'Polygon',
-  BNB: 'BNB Chain',
-};
+import {
+  buildExplorerParams,
+  EXPLORER_API_URL,
+  getExplorerArrayResult,
+  getExplorerBalanceResult,
+  getExplorerErrorMessage,
+  getExplorerProxyResult,
+  NETWORK_LABELS,
+} from './explorerApi';
 
 const formatNumber = (value, maximumFractionDigits = 4) => {
   const numericValue = Number(value);
@@ -62,28 +64,6 @@ const formatTimestamp = (timeStamp) => {
   return new Date(numericStamp * 1000).toLocaleString();
 };
 
-const getProxyResult = (response, label, options = {}) => {
-  const { allowNull = false } = options;
-  const data = response?.data;
-
-  if (data?.result === null && allowNull) {
-    return null;
-  }
-
-  if (data?.result && typeof data.result === 'object' && !Array.isArray(data.result)) {
-    return data.result;
-  }
-
-  const rawMessage =
-    typeof data?.result === 'string'
-      ? data.result
-      : typeof data?.message === 'string'
-        ? data.message
-        : `Unexpected response while loading ${label}.`;
-
-  throw new Error(rawMessage);
-};
-
 const getTransactionStatus = (status) => {
   if (status === '0x1') {
     return { label: 'Success', tone: 'success' };
@@ -108,30 +88,15 @@ const BalanceComponent = () => {
   const [cryptoType, setCryptoType] = useState('ETH');
   const [suspiciousTxs, setSuspiciousTxs] = useState([]);
 
-  const apiKeys = {
-    ETH: process.env.REACT_APP_API_KEY || 'FGFBRUK59JWY3HYVGIJ5VMHHMYBAHY6V6U',
-    MATIC: 'DKJ4RGNR687ZYKTSI15H7AHMBITCQMIUZR',
-    BNB: 'C2X1AEKX5RS7R7R8YCA2SBSHN6UZEVG77A',
-  };
-
-  const chainIds = {
-    ETH: 1,
-    MATIC: 137,
-    BNB: 56,
-  };
-
   const isAddress = (input) => /^0x[a-fA-F0-9]{40}$/.test(input);
   const isBitcoinAddress = (input) =>
     /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$|^bc1[ac-hj-np-z02-9]{11,71}$/.test(input);
   const isTxHash = (input) => /^0x[a-fA-F0-9]{64}$/.test(input);
 
-  const safeResult = (response) => {
-    const { data } = response;
-    if (data && (data.status === '1' || data.message === 'OK') && Array.isArray(data.result)) {
-      return data.result;
-    }
-    return [];
-  };
+  const requestExplorer = (params) =>
+    axios.get(EXPLORER_API_URL, {
+      params: buildExplorerParams(cryptoType, params),
+    });
 
   const weiToEther = (wei, type = 'ETH') => {
     if (!wei) return '0';
@@ -211,29 +176,26 @@ const BalanceComponent = () => {
     setLookupType('txhash');
 
     try {
-      const txResponse = await axios.get('https://api.etherscan.io/v2/api', {
-        params: {
-          chainid: chainIds[cryptoType] || 1,
-          module: 'proxy',
-          action: 'eth_getTransactionByHash',
-          txhash: txHash,
-          apikey: apiKeys[cryptoType],
-        },
+      const txResponse = await requestExplorer({
+        module: 'proxy',
+        action: 'eth_getTransactionByHash',
+        txhash: txHash,
       });
 
-      const txData = getProxyResult(txResponse, 'transaction details');
+      const txData = getExplorerProxyResult(txResponse.data, cryptoType, 'transaction details');
 
-      const receiptResponse = await axios.get('https://api.etherscan.io/v2/api', {
-        params: {
-          chainid: chainIds[cryptoType] || 1,
-          module: 'proxy',
-          action: 'eth_getTransactionReceipt',
-          txhash: txHash,
-          apikey: apiKeys[cryptoType],
-        },
+      const receiptResponse = await requestExplorer({
+        module: 'proxy',
+        action: 'eth_getTransactionReceipt',
+        txhash: txHash,
       });
 
-      const receiptData = getProxyResult(receiptResponse, 'transaction receipt', { allowNull: true });
+      const receiptData = getExplorerProxyResult(
+        receiptResponse.data,
+        cryptoType,
+        'transaction receipt',
+        { allowNull: true }
+      );
       const normalizedTx = {
         ...txData,
         hash: txData.hash || receiptData?.transactionHash || txHash,
@@ -255,7 +217,7 @@ const BalanceComponent = () => {
         suspiciousReasons,
       });
     } catch (err) {
-      setError(`Unable to load transaction details: ${err.message}`);
+      setError(`Unable to load transaction details: ${getExplorerErrorMessage(err, cryptoType, 'transaction details')}`);
     } finally {
       setIsLoading(false);
     }
@@ -300,28 +262,21 @@ const BalanceComponent = () => {
     setSuspiciousTxs([]);
     setLookupType('address');
 
-    const baseUrl = 'https://api.etherscan.io/v2/api';
-    const chainId = chainIds[type];
-    const apiKey = apiKeys[type];
-
     try {
-      const balanceRes = await axios.get(baseUrl, {
-        params: {
-          chainid: chainId,
+      const balanceRes = await axios.get(EXPLORER_API_URL, {
+        params: buildExplorerParams(type, {
           module: 'account',
           action: 'balance',
           address,
           tag: 'latest',
-          apikey: apiKey,
-        },
+        }),
       });
 
-      const balanceVal = balanceRes.data.result / 1e18;
+      const balanceVal = Number(getExplorerBalanceResult(balanceRes.data, type)) / 1e18;
       setBalances((prev) => ({ ...prev, [type]: balanceVal }));
 
-      const txRes = await axios.get(baseUrl, {
-        params: {
-          chainid: chainId,
+      const txRes = await axios.get(EXPLORER_API_URL, {
+        params: buildExplorerParams(type, {
           module: 'account',
           action: 'txlist',
           address,
@@ -330,25 +285,22 @@ const BalanceComponent = () => {
           page: 1,
           offset: 20,
           sort: 'desc',
-          apikey: apiKey,
-        },
+        }),
       });
 
-      const txs = safeResult(txRes);
+      const txs = getExplorerArrayResult(txRes.data, type, 'normal transactions');
 
-      const intRes = await axios.get(baseUrl, {
-        params: {
-          chainid: chainId,
+      const intRes = await axios.get(EXPLORER_API_URL, {
+        params: buildExplorerParams(type, {
           module: 'account',
           action: 'txlistinternal',
           address,
           page: 1,
           offset: 10,
           sort: 'desc',
-          apikey: apiKey,
-        },
+        }),
       });
-      const intTxs = safeResult(intRes);
+      const intTxs = getExplorerArrayResult(intRes.data, type, 'internal transactions');
 
       const combined = []
         .concat(txs)
@@ -362,7 +314,7 @@ const BalanceComponent = () => {
       setTransactions(combined);
       setSuspiciousTxs(detectCoinMixing(combined));
     } catch (err) {
-      setError(`Error fetching ${type} data: ${err.message}`);
+      setError(`Unable to load ${NETWORK_LABELS[type]} data: ${getExplorerErrorMessage(err, type, 'wallet data')}`);
     } finally {
       setIsLoading(false);
     }
